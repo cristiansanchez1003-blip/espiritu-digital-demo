@@ -41,10 +41,16 @@ def get_genai_client():
     if client is None:
         try:
             from google import genai
-            api_key = os.environ.get("GOOGLE_API_KEY", "AIzaSyC24QfSRBBsa6A2QTEJ6vb9zOyvyPagoYo")
+            api_key = os.environ.get("GOOGLE_API_KEY")
+            if not api_key:
+                print("Advertencia: GOOGLE_API_KEY no está configurada.")
+                return None
             client = genai.Client(api_key=api_key)
         except ImportError:
             print("Advertencia: google-generativeai no está instalado. Las funciones IA no estarán disponibles.")
+            return None
+        except Exception as e:
+            print(f"Advertencia: Error al inicializar cliente IA: {e}")
             return None
     return client
 
@@ -480,12 +486,18 @@ Reglas de formato:
 2. Formatea precios como $X.XXX (ej: $1.500).
 3. Sé amigable y natural, como un vecino del barrio."""
 
-            c = get_genai_client()
-            if c is None:
+            try:
+                c = get_genai_client()
+                if c is None:
+                    return jsonify({
+                        "respuesta": "Error: El servicio de IA no está disponible (API Key faltante o librería no instalada).",
+                        "carrito": carrito_actual
+                    }), 500
+            except Exception as e:
                 return jsonify({
-                    "error": "El servicio de IA no está disponible.",
-                    "mensaje": "Por favor, instala google-generativeai con: pip install google-generativeai"
-                }), 503
+                    "respuesta": f"Error al inicializar la IA: {str(e)}",
+                    "carrito": carrito_actual
+                }), 500
             
             from google.genai import types
 
@@ -503,12 +515,16 @@ Reglas de formato:
                     config=config
                 )
             except Exception as e:
-                if "429" in str(e):
+                error_msg = str(e)
+                if "429" in error_msg:
                     return jsonify({
                         "respuesta": "Lo siento, Robot.ia ha alcanzado su límite de consultas gratuitas en este modelo por hoy. Por favor, intenta de nuevo en unos minutos o cambia a Modo Demo.",
                         "carrito": carrito_actual
                     }), 429
-                raise e
+                return jsonify({
+                    "respuesta": f"Error en la API de Gemini: {error_msg}",
+                    "carrito": carrito_actual
+                }), 500
 
             # Mapa de funciones disponibles
             funciones_disponibles = {
