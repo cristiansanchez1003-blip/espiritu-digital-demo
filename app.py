@@ -21,19 +21,6 @@ import urllib.parse
 app = Flask(__name__, template_folder="templates", static_folder="static")
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# CONFIGURACIÓN DE SEGURIDAD
-# En producción, usa variables de entorno para esto
-API_TOKEN_ESPIRITU = "ESPIRITU_SUR_2026_SEGURIDAD_MAXIMA"
-
-def proteger_con_token(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        token_cliente = request.headers.get('x-api-token')
-        if token_cliente != API_TOKEN_ESPIRITU:
-            return jsonify({"error": "Acceso no autorizado. Token inválido o ausente."}), 403
-        return f(*args, **kwargs)
-    return decorated_function
-
 # El cliente se inicializará perezosamente para evitar bloqueos en el arranque
 client = None
 def get_genai_client():
@@ -41,7 +28,7 @@ def get_genai_client():
     if client is None:
         try:
             from google import genai
-            api_key = os.environ.get("GOOGLE_API_KEY")
+            api_key = os.environ.get("AIzaSyC24QfSRBBsa6A2QTEJ6vb9zOyvyPagoYo")
             if not api_key:
                 print("Advertencia: GOOGLE_API_KEY no está configurada.")
                 return None
