@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary": "#2D6A4F",
+            "background": "#F8F9F5",
+            "surface": "#F8F9F5",
+            "on-surface": "#2D3142",
+            "on-background": "#2D3142",
+            "primary-container": "#2D6A4F",
+            "on-primary-container": "#F8F9F5",
+            "secondary": "#D9ED92",
+            "on-secondary": "#1B4332",
+            "outline": "#2D3142",
+            "surface-container": "#F1F2ED"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.5rem",
+            "lg": "0.75rem",
+            "xl": "1rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "24px",
+            "margin-desktop": "40px",
+            "section-gap": "80px",
+            "margin-mobile": "16px",
+            "unit": "8px",
+            "container-max": "1280px"
+          },
+          "fontFamily": {
+            "label-sm": ["Poppins", "Inter", "sans-serif"],
+            "headline-md": ["Montserrat", "Inter", "sans-serif"],
+            "body-md": ["Poppins", "Inter", "sans-serif"],
+            "headline-lg": ["Montserrat", "Inter", "sans-serif"],
+            "display-lg": ["Montserrat", "Inter", "sans-serif"],
+            "body-lg": ["Poppins", "Inter", "sans-serif"],
+            "label-md": ["Montserrat", "Inter", "sans-serif"]
+          },
+          "fontSize": {
+            "label-sm": ["12px", { "lineHeight": "1.0", "fontWeight": "500" }],
+            "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+            "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+            "label-md": ["14px", { "lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .ambient-shadow {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ambient-shadow-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(45, 106, 79, 0.12);
+    }
+
+    .card-premium {
+      background: white;
+      border-radius: 12px !important;
+      border: 1px solid rgba(45, 106, 79, 0.05);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .card-premium:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(45, 106, 79, 0.1);
+    }
+
+    .btn-outline-premium {
+      background-color: white !important;
+      color: #2D6A4F !important;
+      border: 2px solid #2D6A4F !important;
+      border-radius: 12px !important;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-premium:hover {
+      background-color: #2D6A4F !important;
+      color: white !important;
+      box-shadow: 0 8px 16px rgba(45, 106, 79, 0.2);
+    }
+
+    .btn-solid-premium {
+      background-color: #2D6A4F !important;
+      color: white !important;
+      border-radius: 12px !important;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(45, 106, 79, 0.15);
+    }
+
+    .btn-solid-premium:hover {
+      background-color: #1B4332 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(45, 106, 79, 0.25);
+    }
+
+    /* === SABORES DEL SUR ANIMATION SYSTEM === */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.92);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes floatLogo {
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-6px);
+      }
+    }
+
+    /* Scroll-triggered animation classes */
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .animate-on-scroll.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .animate-scale-on-scroll {
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .animate-scale-on-scroll.is-visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Stagger children */
+    .stagger-children>*:nth-child(1) {
+      transition-delay: 0ms;
+    }
+
+    .stagger-children>*:nth-child(2) {
+      transition-delay: 120ms;
+    }
+
+    .stagger-children>*:nth-child(3) {
+      transition-delay: 240ms;
+    }
+
+    .stagger-children>*:nth-child(4) {
+      transition-delay: 360ms;
+    }
+
+    /* Enhanced card hover */
+    .card-lift {
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+    }
+
+    .card-lift:hover {
+      transform: translateY(-8px);
+      box-shadow: 0px 20px 40px rgba(1, 68, 33, 0.1);
+    }
+
+    /* Logo float */
+    .logo-float {
+      animation: floatLogo 4s ease-in-out infinite;
+    }
+
+    /* Hero entrance */
+    .hero-entrance {
+      animation: fadeInUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+    }
+
+    /* === MOBILE OPTIMIZATION === */
+    @media (max-width: 767px) {
+
+      .px-8,
+      .px-6,
+      .px-4 {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .font-display-lg {
+        font-size: calc(48px * 0.85) !important;
+      }
+
+      .font-headline-lg {
+        font-size: calc(32px * 0.85) !important;
+      }
+
+      .font-headline-md {
+        font-size: calc(24px * 0.85) !important;
+      }
+
+      .grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .md\:flex-row {
+        flex-direction: column !important;
+      }
+
+      header,
+      nav {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 50 !important;
+      }
+    }
+
+    body {
+      background-color: #F8F9F5 !important;
+      color: #2D3142 !important;
+    }
+
+    .brand-logo-shell {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(45, 106, 79, 0.05);
+    }
+
+    .brand-logo-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url('{{ url_for('static', filename='local .jpeg') }}') center center / cover no-repeat;
+      opacity: 0.1;
+      filter: grayscale(100%);
+    }
+
+    .brand-logo {
+      position: relative;
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      opacity: 0.95;
+    }
+
+    nav.app-nav,
+    footer.site-footer {
+      border-color: rgba(45, 106, 79, 0.1) !important;
+    }
+
+    nav.app-nav {
+      position: fixed !important;
+      top: 1.5rem !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: 95% !important;
+      max-width: 1200px !important;
+      background-color: rgba(248, 249, 245, 0.95) !important;
+      backdrop-blur: 12px !important;
+      border-radius: 16px !important;
+      border: 1px solid rgba(45, 106, 79, 0.1) !important;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08) !important;
+      height: 72px !important;
+      padding: 0 2rem !important;
+      z-index: 1000 !important;
+    }
+
+    nav.app-nav a {
+      color: #2D3142 !important;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    nav.app-nav a:hover {
+      color: #2D6A4F !important;
+    }
+
+    nav.app-nav a[href*="inventario.html"] {
+      background-color: #2D6A4F !important;
+      color: white !important;
+      padding: 0.6rem 1.2rem !important;
+      border-radius: 12px !important;
+      border: none !important;
+    }
+
+    nav.app-nav a[href*="inventario.html"]:hover {
+      background-color: #1B4332 !important;
+      transform: translateY(-1px);
+    }
+
+    .material-symbols-outlined {
+      color: #2D6A4F;
+    }
+
+    nav.app-nav .material-symbols-outlined {
+      color: #2D6A4F !important;
+    }
+
+    nav.app-nav .material-symbols-outlined:hover {
+      color: #1B4332 !important;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      color: #2D6A4F !important;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: #2D3142;
+    }
+
+    button, .btn-glow, .bg-primary, .bg-primary-container {
+      background-color: #000000 !important;
+      color: #F8F9F5 !important;
+      border-radius: 12px !important;
+      font-weight: 600;
+      letter-spacing: 0.025em;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    button:hover, .btn-glow:hover, .bg-primary:hover, .bg-primary-container:hover {
+      background-color: #333333 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .ambient-shadow, .card-lift, [class*="bg-white rounded"], [class*="rounded-lg"] {
+      border-radius: 16px !important;
+      border: 1px solid rgba(45, 106, 79, 0.05);
+    }
+
+    footer.site-footer {
+      background-color: #F1F2ED !important;
+      border-top: 1px solid rgba(45, 106, 79, 0.1) !important;
+      color: #2D3142 !important;
+    }
+
+    footer.site-footer a {
+      color: #2D3142 !important;
+      opacity: 0.8;
+    }
+
+    footer.site-footer a:hover {
+      color: #2D6A4F !important;
+      opacity: 1;
+    }
+
+    footer.site-footer p {
+      color: #2D3142 !important;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body class="font-body-md text-on-surface antialiased">
+    <!-- TopNavBar Shared Component -->
+  <nav
+    class="app-nav fixed top-0 left-0 w-full z-50 flex justify-between items-center px-8 h-20 max-w-7xl mx-auto left-1/2 -translate-x-1/2 backdrop-blur-md border-b font-['Inter'] antialiased">
+    <div class="flex items-center gap-12">
+      <a href="{{ url_for('index') }}" class="brand-logo-shell">
+        <img src="{{ url_for('static', filename='Sabores del sur logo.jpeg') }}" alt="Sabores del Sur Logo" class="brand-logo hover:scale-105 transition-transform duration-300 cursor-pointer drop-shadow-md logo-float">
+      </a>
+      <div class="hidden md:flex items-center gap-8">
+        <a class="text-slate-600 dark:text-slate-400 font-medium hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-200"
+          href="{{ url_for('index') }}">Inicio</a>
+        <a class="text-slate-600 dark:text-slate-400 font-medium hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-200"
+          href="{{ url_for('catalogo') }}">Productos</a>
+        <a class="text-slate-600 dark:text-slate-400 font-medium hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-200"
+          href="{{ url_for('recetas') }}">Recetas IA</a>
+
+        <a class="text-emerald-900 dark:text-emerald-400 font-semibold border-b-2 border-emerald-900 dark:border-emerald-400 pb-1 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-200"
+          href="{{ url_for('cuenta') }}">Mi cuenta</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <a href="{{ url_for('inventario_page') }}"
+        class="hidden md:flex items-center gap-1.5 px-4 py-2 bg-[#2D6A4F] text-white rounded-xl font-semibold text-[13px] hover:bg-[#1B4332] transition-all shadow-sm">
+        <span class="material-symbols-outlined text-[16px] text-white">inventory_2</span>Inventario</a>
+      <a href="{{ url_for('carrito_page') }}"
+        class="flex items-center gap-2 active:scale-95 transition-transform hover:bg-emerald-50 dark:hover:bg-emerald-900/20 p-2 rounded-full">
+        <span class="material-symbols-outlined text-emerald-900 dark:text-emerald-50">shopping_cart</span>
+        <div class="hidden md:flex flex-col text-left">
+          <span id="cartCount" class="w-5 h-5 flex items-center justify-center bg-[#D9ED92] text-[#1B4332] text-[10px] font-bold rounded-full absolute -top-1 -right-1 shadow-sm border border-white">0</span>
+          <span id="cartTotal" class="text-xs font-semibold text-emerald-700 leading-none">$0</span>
+        </div>
+      </a>
+      <button
+        class="btn-outline-premium p-2 flex items-center justify-center">
+        <span class="material-symbols-outlined text-[#2D6A4F]">account_circle</span>
+      </button>
+    </div>
+  </nav>
+<main class="pt-32 pb-20 px-8 max-w-7xl mx-auto">
+<!-- Profile Summary Section -->
+<section class="mb-section-gap">
+<div class="bg-surface-container-lowest rounded-lg p-8 shadow-[0px_12px_32px_rgba(1,68,33,0.04)] flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-6">
+<div class="w-24 h-24 rounded-full bg-surface-container flex items-center justify-center overflow-hidden border-2 border-primary-container/10">
+<img class="w-full h-full object-cover" data-alt="A professional portrait of a smiling man in his early 30s with a clean-cut beard, wearing a high-quality linen shirt. The background is a soft, out-of-focus Mediterranean market scene with warm, natural sunlight. The image has a premium, airy aesthetic with subtle green and earthy tones to match the luxury grocer brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuADE9lyVCTsbQ9FL5bcHIJXUHj3QN_WsehBfwttdvyCwBR9Hvysd6ow814N_nZYwNk7rMhn7NnyGhzdzCsPe7bgaZwqFzV4mLXS9peckubSC8frejUHGChOzEEjgqLE9o1CwKkiTD5fwlKR24e4-27XDvxsE41g79C_-7Gqs9-OuEevEOMrBzZ32UH1NI00mx1met5zrQsPMNZDL4J6pDKBwTQELjzj87zJqM0U3ilPtEFDkMeb17bCVCWa-tqqtHxVXloTZb9vGdE"/>
+</div>
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h1 class="font-headline-md text-headline-md text-primary">Cristian</h1>
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full">Miembro Premium</span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md">cristian.Sabores del Sur@digitalatelier.com</p>
+</div>
+</div>
+<div>
+<button class="bg-[#1B4332] text-white px-8 py-4 rounded-lg font-label-md text-label-md flex items-center gap-3 hover:bg-primary transition-all shadow-sm active:scale-95">
+<span class="material-symbols-outlined text-lg" data-icon="rebase_edit">rebase_edit</span>
+                        Repetir último pedido
+                    </button>
+</div>
+</div>
+</section>
+<!-- Main Grid for Account Details -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Sidebar Navigation -->
+<aside class="lg:col-span-3 space-y-2">
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-4 p-4 rounded-lg bg-primary-container/5 text-primary font-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+                        Mi Perfil
+                    </a>
+<a class="flex items-center gap-4 p-4 rounded-lg text-on-surface-variant hover:bg-stone-100 transition-colors font-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+                        Mis Pedidos
+                    </a>
+<a class="flex items-center gap-4 p-4 rounded-lg text-on-surface-variant hover:bg-stone-100 transition-colors font-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+                        Favoritos
+                    </a>
+<a class="flex items-center gap-4 p-4 rounded-lg text-on-surface-variant hover:bg-stone-100 transition-colors font-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+                        Direcciones
+                    </a>
+<div class="h-px bg-stone-200 my-4"></div>
+<a class="flex items-center gap-4 p-4 rounded-lg text-error hover:bg-error-container/10 transition-colors font-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                        Cerrar Sesión
+                    </a>
+</nav>
+</aside>
+<!-- Recent Orders Content -->
+<div class="lg:col-span-9 space-y-8">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary mb-6">Mis Pedidos Recientes</h2>
+<div class="bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0px_12px_32px_rgba(1,68,33,0.02)]">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse font-body-md">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant border-b border-outline-variant">
+<th class="px-6 py-4 font-label-md text-label-md uppercase tracking-wider">ID del Pedido</th>
+<th class="px-6 py-4 font-label-md text-label-md uppercase tracking-wider">Fecha</th>
+<th class="px-6 py-4 font-label-md text-label-md uppercase tracking-wider">Estado</th>
+<th class="px-6 py-4 font-label-md text-label-md uppercase tracking-wider">Total</th>
+<th class="px-6 py-4 font-label-md text-label-md uppercase tracking-wider">Productos</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-stone-100" id="ordersTableBody">
+<!-- Dynamic content will be injected here via JS -->
+</tbody>
+</table>
+</div>
+</div>
+
+<script>
+async function loadOrders() {
+    const tableBody = document.getElementById('ordersTableBody');
+    try {
+        const response = await fetch('/ultimo-pedido');
+        if (!response.ok) {
+            if (response.status === 404) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-stone-500 font-medium bg-stone-50/50">Aún no has realizado compras</td></tr>`;
+            } else {
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-error font-medium">Error al cargar los pedidos.</td></tr>`;
+            }
+            return;
+        }
+        
+        const data = await response.json();
+        
+        // Formatear los productos
+        const productosResumen = data.productos.map(p => `${p.nombre} x${p.cantidad}`).join(', ');
+        
+        // Simular un ID aleatorio o fijo ya que el JSON no lo tiene
+        const pedidoID = Math.floor(Math.random() * 9000) + 1000;
+        
+        tableBody.innerHTML = `
+            <tr class="custom-table-row transition-colors hover:bg-stone-50">
+                <td class="px-6 py-6 font-semibold text-primary">#${pedidoID}</td>
+                <td class="px-6 py-6 text-on-surface-variant">${data.fecha_pedido}</td>
+                <td class="px-6 py-6">
+                    <span class="bg-[#D8F3DC] text-[#1B4332] text-[11px] font-bold px-3 py-1 rounded-full">${data.estado}</span>
+                </td>
+                <td class="px-6 py-6 font-semibold text-primary">$${data.total.toLocaleString('es-CL')}</td>
+                <td class="px-6 py-6 text-sm text-stone-600">${productosResumen}</td>
+            </tr>
+        `;
+    } catch (error) {
+        console.error('Fetch error:', error);
+        tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-stone-500 font-medium">No se pudo conectar con el servidor.</td></tr>`;
+    }
+}
+
+// Global scope
+window.loadOrders = loadOrders;
+
+// Load on start
+document.addEventListener('DOMContentLoaded', loadOrders);
+</script>
+</div>
+<!-- Featured Membership Benefit Section (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-primary-container text-on-primary-container p-8 rounded-lg relative overflow-hidden group">
+<div class="relative z-10">
+<h3 class="font-headline-md text-headline-md mb-2 text-primary-fixed">Sostenibilidad Premium</h3>
+<p class="font-body-md text-white/80 mb-6">Has ahorrado 12kg de emisiones de CO2 este mes gracias a nuestras rutas de entrega optimizadas para miembros.</p>
+<button class="border border-white/20 px-6 py-2 rounded text-white font-label-md hover:bg-white/10 transition-colors">Ver Impacto</button>
+</div>
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-9xl opacity-10 group-hover:scale-110 transition-transform" data-icon="eco">eco</span>
+</div>
+<div class="bg-surface-container-high p-8 rounded-lg border border-outline-variant flex flex-col justify-between">
+<div>
+<h3 class="font-headline-md text-headline-md mb-2 text-primary">Proveniencia Garantizada</h3>
+<p class="font-body-md text-on-surface-variant">Tus productos actuales vienen de 4 granjas certificadas en la región del Biobío.</p>
+</div>
+<div class="flex -space-x-3 mt-4">
+<div class="w-10 h-10 rounded-full border-2 border-surface bg-stone-200 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up of a weathered local farmer smiling warmly at the camera. Soft morning light in a rural field setting. High-end photography style focusing on authentic human connection." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYB6kB6u8SfeaWFUnbjve1xFOVqU_pM8pASuvdSMLdDueIFXqot3GkHkxl9l2dsKVv0mmC2TgP3T1RLTJfxdXXuYbk6J4pdD_3Pu09DGsu-rYR0MfGPMfECE2Pup4maXVVlIftwN5DtXW2oHrdw7tkG77I9lhNEGA6PoNSfYfzHEmJDTsahKXMmKWAivnLMlK6YAKXuDgtZZ5qUV_7hnB_rwm3Erjui98qoJ32TPuKfSk_okOdpDrLpBJkTrToIdNkh6pyTq1UBL0"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-surface bg-stone-200 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a young woman working in an organic greenhouse, surrounded by lush green vegetables. Vibrant natural colors and professional depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeNb8wgepC5VdSV3iqwMmqAI722g7ilItTiafhWGc8OD84BHwYWX38CfQgRatpj7mOswSCMxg41pOEJYpa4j95HPFOW9uDL3A0ornz5xquqT7ca_eXvvJPF-BgWs7ZalrWf8fS8dd7yafQag05a_OofAJYEHbSiAa_tiVJeZiMgOSCBTfvrXPvp3cw_EYAmm2Lx6BZMzTl1UpEEgJDQzVa2-2P_lfmtFaukVTyBmSliOk3h85YWsMIe10-UQW1Xl29cHcDCmq1bCk"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-surface bg-primary text-white flex items-center justify-center font-label-sm text-[10px]">+2</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-stone-50 dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800">
+<div class="flex flex-col md:flex-row justify-between items-center py-12 px-8 max-w-7xl mx-auto gap-8">
+<div class="flex flex-col gap-2">
+<a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='Sabores del sur logo.jpeg') }}" alt="Sabores del Sur Logo" class="h-10 w-auto drop-shadow-md"></a>
+<p class="font-body-md text-sm text-stone-500 dark:text-stone-400">© 2024 Sabores del Sur. Digital Atelier for the Modern Grocer.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-stone-500 dark:text-stone-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline underline-offset-4 transition-all font-label-md text-sm" href="#">Sustainability</a>
+<a class="text-stone-500 dark:text-stone-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline underline-offset-4 transition-all font-label-md text-sm" href="#">Our Farms</a>
+<a class="text-stone-500 dark:text-stone-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline underline-offset-4 transition-all font-label-md text-sm" href="#">Privacy Policy</a>
+<a class="text-stone-500 dark:text-stone-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline underline-offset-4 transition-all font-label-md text-sm" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('is-visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('section, .bg-surface-container-lowest, .bg-primary-container, .bg-surface-container-high, table').forEach(el => {
+      el.classList.add('animate-on-scroll'); observer.observe(el);
+    });
+    document.querySelectorAll('.bg-primary-container, .bg-surface-container-high').forEach(c => c.classList.add('card-lift'));
+    document.querySelectorAll('img[alt="Sabores del Sur Logo"]').forEach(l => l.classList.add('logo-float'));
+    const h1 = document.querySelector('h1'); if (h1) h1.classList.add('hero-entrance');
+  });
+</script>
+</body></html>

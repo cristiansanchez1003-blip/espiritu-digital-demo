@@ -1,0 +1,16 @@
+{
+    "fecha_pedido": "2026-05-11 23:22:43",
+    "productos": [
+        {
+            "id": 22,
+            "nombre": "Mayonesa Hellmann's Supreme 400g",
+            "precio": 2800,
+            "cantidad": 1,
+            "subtotal": 2800
+        }
+    ],
+    "total": 2800,
+    "descuento": 0,
+    "promos_aplicadas": [],
+    "estado": "Confirmado"
+}
