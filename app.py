@@ -41,7 +41,7 @@ def get_genai_client():
     if client is None:
         try:
             from google import genai
-            api_key = os.environ.get("GOOGLE_API_KEY", "AIzaSyAkS1aND4le5-E8nHuvcPWkU_FXBkYQk10")
+            api_key = os.environ.get("GOOGLE_API_KEY", "AIzaSyC24QfSRBBsa6A2QTEJ6vb9zOyvyPagoYo")
             client = genai.Client(api_key=api_key)
         except ImportError:
             print("Advertencia: google-generativeai no está instalado. Las funciones IA no estarán disponibles.")
