@@ -498,7 +498,7 @@ Reglas de formato:
             # Primera llamada al modelo
             try:
                 response = c.models.generate_content(
-                    model='gemini-2.0-flash',
+                    model='gemini-1.5-flash',
                     contents=mensaje_usuario,
                     config=config
                 )
