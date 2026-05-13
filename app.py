@@ -13,7 +13,7 @@ import urllib.parse
 # ⚙️ CONFIGURACIÓN INICIAL
 # ==========================================
 # Verificación de API Key para Logs de Render
-_api_key_status = os.environ.get("GOOGLE_API_KEY")
+_api_key_status = os.environ.get("GOOGLE_API_KEY", "AIzaSyC24QfSRBBsa6A2QTEJ6vb9zOyvyPagoYo")
 if _api_key_status:
     print("✅ API KEY DETECTADA (longitud: {})".format(len(_api_key_status)))
 else:
@@ -37,7 +37,7 @@ def get_genai_client():
     if client is None:
         try:
             from google import genai
-            api_key = os.environ.get("GOOGLE_API_KEY")
+            api_key = os.environ.get("GOOGLE_API_KEY", "AIzaSyC24QfSRBBsa6A2QTEJ6vb9zOyvyPagoYo")
             if not api_key:
                 print("⚠️ GOOGLE_API_KEY no está configurada.")
                 return None
