@@ -27,29 +27,30 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_FILE = os.path.join(BASE_DIR, "sabores_del_sur.db")
 PEDIDO_FILE = os.path.join(BASE_DIR, "pedido.json")
 
-# Cliente IA (inicialización perezosa)
-client = None
+# IA configurada (inicialización perezosa)
+_genai_configured = False
 
 
-def get_genai_client():
-    """Inicializa el cliente de Gemini de forma perezosa."""
-    global client
-    if client is None:
+def configure_genai():
+    """Configura google.generativeai de forma perezosa."""
+    global _genai_configured
+    if not _genai_configured:
         try:
-            from google import genai
+            import google.generativeai as genai
             api_key = os.environ.get("GOOGLE_API_KEY", "AIzaSyC24QfSRBBsa6A2QTEJ6vb9zOyvyPagoYo")
             if not api_key:
                 print("⚠️ GOOGLE_API_KEY no está configurada.")
-                return None
-            client = genai.Client(api_key=api_key)
-            print("✅ Cliente Gemini inicializado correctamente.")
+                return False
+            genai.configure(api_key=api_key)
+            _genai_configured = True
+            print("✅ Gemini configurado correctamente.")
         except ImportError:
             print("⚠️ google-generativeai no instalado.")
-            return None
+            return False
         except Exception as e:
-            print(f"⚠️ Error al inicializar cliente IA: {e}")
-            return None
-    return client
+            print(f"⚠️ Error al configurar Gemini: {e}")
+            return False
+    return True
 
 
 # ==========================================
@@ -428,34 +429,36 @@ def chat():
                 "3. Sé amigable y natural, como un vecino del barrio."
             )
 
-            # Inicializar cliente IA con protección
+            # Configurar Gemini con protección
             try:
-                c = get_genai_client()
-                if c is None:
+                import google.generativeai as genai
+                if not configure_genai():
                     return jsonify({
                         "respuesta": "El servicio de IA no está disponible. Verifica que GOOGLE_API_KEY esté configurada en Render.",
                         "carrito": carrito_actual
                     }), 500
             except Exception as e:
                 return jsonify({
-                    "respuesta": f"Error al inicializar la IA: {str(e)}",
+                    "respuesta": f"Error al configurar la IA: {str(e)}",
                     "carrito": carrito_actual
                 }), 500
 
-            try:
-                from google.genai import types
+            # Mapa de funciones disponibles
+            funciones_disponibles = {
+                "consultar_inventario": consultar_inventario,
+                "agregar_producto": agregar_producto,
+                "calcular_total": calcular_total,
+                "confirmar_compra": confirmar_compra,
+            }
 
-                config = types.GenerateContentConfig(
+            try:
+                model = genai.GenerativeModel(
+                    model_name='gemini-1.5-flash',
                     system_instruction=sys_instruction,
                     tools=tools_list,
-                    temperature=0.3
+                    generation_config=genai.GenerationConfig(temperature=0.3)
                 )
-
-                response = c.models.generate_content(
-                    model='gemini-1.5-flash',
-                    contents=mensaje_usuario,
-                    config=config
-                )
+                response = model.generate_content(mensaje_usuario)
             except Exception as e:
                 error_msg = str(e)
                 if "429" in error_msg:
@@ -468,61 +471,56 @@ def chat():
                     "carrito": carrito_actual
                 }), 500
 
-            # Mapa de funciones disponibles
-            funciones_disponibles = {
-                "consultar_inventario": consultar_inventario,
-                "agregar_producto": agregar_producto,
-                "calcular_total": calcular_total,
-                "confirmar_compra": confirmar_compra,
-            }
+            import google.generativeai.types as gtypes
 
             # Bucle de function calling (máximo 5 turnos)
             mensaje_respuesta = ""
-            try:
-                from google.genai import types as gtypes
-            except ImportError:
-                gtypes = types
+            historial_contenidos = [
+                {"role": "user", "parts": [mensaje_usuario]}
+            ]
 
             for _turno in range(5):
-                if not response.function_calls:
+                # Verificar si hay function calls en la respuesta
+                candidate = response.candidates[0] if response.candidates else None
+                has_fc = (
+                    candidate is not None
+                    and any(
+                        part.function_call.name
+                        for part in candidate.content.parts
+                        if hasattr(part, 'function_call') and part.function_call.name
+                    )
+                )
+
+                if not has_fc:
                     mensaje_respuesta = response.text or ""
                     break
 
-                model_parts = [
-                    types.Part.from_function_call(name=fc.name, args=fc.args)
-                    for fc in response.function_calls
-                ]
+                # Añadir la respuesta del modelo al historial
+                historial_contenidos.append({"role": "model", "parts": candidate.content.parts})
 
-                response_parts = []
-                for fc in response.function_calls:
-                    fn = funciones_disponibles.get(fc.name)
-                    try:
-                        if fn:
-                            resultado = fn(**fc.args) if fc.args else fn()
+                # Ejecutar function calls y construir respuestas
+                function_responses = []
+                for part in candidate.content.parts:
+                    if hasattr(part, 'function_call') and part.function_call.name:
+                        fc = part.function_call
+                        fn = funciones_disponibles.get(fc.name)
+                        try:
+                            args = dict(fc.args) if fc.args else {}
+                            resultado = fn(**args) if fn else "Error: Función no encontrada"
                             if fc.name != "consultar_inventario":
                                 mensaje_sistema_res = resultado
-                            response_parts.append(types.Part.from_function_response(
-                                name=fc.name, response={"result": resultado}
-                            ))
-                        else:
-                            response_parts.append(types.Part.from_function_response(
-                                name=fc.name, response={"result": "Error: Función no encontrada"}
-                            ))
-                    except Exception as e:
-                        response_parts.append(types.Part.from_function_response(
-                            name=fc.name, response={"result": f"Error: {str(e)}"}
-                        ))
+                        except Exception as ex:
+                            resultado = f"Error: {str(ex)}"
+                        function_responses.append(
+                            gtypes.content_types.to_part(
+                                {"function_response": {"name": fc.name, "response": {"result": resultado}}}
+                            )
+                        )
+
+                historial_contenidos.append({"role": "user", "parts": function_responses})
 
                 try:
-                    response = c.models.generate_content(
-                        model='gemini-1.5-flash',
-                        contents=[
-                            types.Content(role='user', parts=[types.Part.from_text(text=mensaje_usuario)]),
-                            types.Content(role='model', parts=model_parts),
-                            types.Content(role='user', parts=response_parts),
-                        ],
-                        config=config
-                    )
+                    response = model.generate_content(historial_contenidos)
                 except Exception as e:
                     mensaje_respuesta = f"Error durante la conversación con la IA: {str(e)}"
                     break
