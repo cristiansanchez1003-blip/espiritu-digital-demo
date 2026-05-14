@@ -13,7 +13,7 @@ import urllib.parse
 # ⚙️ CONFIGURACIÓN INICIAL
 # ==========================================
 # Verificación de API Key para Logs de Render
-_api_key_status = os.environ.get("GOOGLE_API_KEY", "AIzaSyC24QfSRBBsa6A2QTEJ6vb9zOyvyPagoYo")
+_api_key_status = os.environ.get("GOOGLE_API_KEY")
 if _api_key_status:
     print("✅ API KEY DETECTADA (longitud: {})".format(len(_api_key_status)))
 else:
@@ -26,31 +26,6 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_FILE = os.path.join(BASE_DIR, "sabores_del_sur.db")
 PEDIDO_FILE = os.path.join(BASE_DIR, "pedido.json")
-
-# IA configurada (inicialización perezosa)
-_genai_configured = False
-
-
-def configure_genai():
-    """Configura google.generativeai de forma perezosa."""
-    global _genai_configured
-    if not _genai_configured:
-        try:
-            import google.generativeai as genai
-            api_key = os.environ.get("GOOGLE_API_KEY", "AIzaSyC24QfSRBBsa6A2QTEJ6vb9zOyvyPagoYo")
-            if not api_key:
-                print("⚠️ GOOGLE_API_KEY no está configurada.")
-                return False
-            genai.configure(api_key=api_key)
-            _genai_configured = True
-            print("✅ Gemini configurado correctamente.")
-        except ImportError:
-            print("⚠️ google-generativeai no instalado.")
-            return False
-        except Exception as e:
-            print(f"⚠️ Error al configurar Gemini: {e}")
-            return False
-    return True
 
 
 # ==========================================
@@ -229,8 +204,8 @@ def calcular_total() -> str:
 # 📞 INTEGRACIONES (WhatsApp)
 # ==========================================
 def enviar_whatsapp_confirmacion(resumen_pedido):
-    telefono = "56928117627"
-    apikey = "4211824"
+    telefono = "56956465104"
+    apikey = "5073002"
     items_msg = ""
     for item in resumen_pedido.get("productos", []):
         items_msg += f"- {item['nombre']} x{item['cantidad']} (${item['subtotal']:,.0f})\n"
@@ -284,7 +259,7 @@ def confirmar_compra(nombre_cliente: str = None):
         return f"Error crítico al guardar el pedido: {str(e)}"
 
 
-tools_list = [consultar_inventario, agregar_producto, confirmar_compra, calcular_total]
+
 
 # ==========================================
 # 🌐 ENDPOINTS DE LA API
@@ -398,9 +373,74 @@ def chat():
             return jsonify({"respuesta": "Mensaje vacío", "carrito": carrito_actual}), 400
 
         mensaje_sistema_res = None
+        contexto_extra = ""
+        msg_lower = mensaje_usuario.lower()
 
+        # --- DETECCIÓN DE INTENCIÓN MANUAL (Igual para MODO DEMO y MODO IA) ---
+        if any(kw in msg_lower for kw in ["pagar", "confirmar", "listo", "comprar"]):
+            nombre_demo = None
+            nombre_match = re.search(r'(?:soy|me llamo|mi nombre es)\s+([a-záéíóúñ]+)', msg_lower)
+            if nombre_match:
+                nombre_demo = nombre_match.group(1).capitalize()
+            mensaje_sistema_res = confirmar_compra(nombre_cliente=nombre_demo)
+            contexto_extra = f"{mensaje_sistema_res}"
+
+        elif any(kw in msg_lower for kw in ["precio", "cuesta", "vale", "cuánto", "cuanto"]):
+            busqueda = msg_lower
+            for pc in ["precio", "cuesta", "vale", "cuánto", "cuanto", "del", "de", "la", "el", "un", "una", "?", "¿"]:
+                busqueda = busqueda.replace(pc, "")
+            busqueda = busqueda.strip().strip("?¿")
+            if busqueda:
+                resultado = consultar_inventario(busqueda)
+                datos = json.loads(resultado)
+                if datos.get("encontrado"):
+                    prods = datos["productos"]
+                    info = [f"{p['nombre']}: ${p['precio']:,} ({p['stock']} uds)" for p in prods[:3]]
+                    contexto_extra = " | ".join(info)
+                else:
+                    contexto_extra = f"No encontré '{busqueda}' en el catálogo."
+            else:
+                contexto_extra = "Dime qué producto te interesa y te doy el precio."
+
+        elif any(kw in msg_lower for kw in ["total", "boleta", "carrito"]):
+            mensaje_sistema_res = calcular_total()
+            contexto_extra = f"{mensaje_sistema_res}"
+
+        elif any(kw in msg_lower for kw in ["qué tienen", "que tienen", "catálogo", "catalogo", "productos", "disponible"]):
+            resultado = consultar_inventario()
+            datos = json.loads(resultado)
+            cats = datos.get("categorias", {})
+            resumen = []
+            for cat, prods in cats.items():
+                nombres_p = [f"{p['nombre']} (${p['precio']:,})" for p in prods[:3]]
+                resumen.append(f"{cat}: {', '.join(nombres_p)}{'...' if len(prods) > 3 else ''}")
+            contexto_extra = f"Tenemos {datos.get('total_productos', 0)} productos. " + " | ".join(resumen[:3])
+
+        elif any(kw in msg_lower for kw in ["agrega", "quiero", "llevar", "dame", "añade", "ponme"]):
+            num_match = re.search(r'\b(\d+)\b', msg_lower)
+            cantidad = int(num_match.group(1)) if num_match else 1
+            conn = conectar_db()
+            cursor = conn.cursor()
+            cursor.execute("SELECT nombre FROM productos ORDER BY LENGTH(nombre) DESC")
+            all_prods = [dict(r) for r in cursor.fetchall()]
+            conn.close()
+            msg_norm = msg_lower.replace("-", " ")
+            producto_detectado = None
+            for prod in all_prods:
+                nombre_norm = prod["nombre"].lower().replace("-", " ")
+                keywords = [w for w in re.split(r'[\s\-/()]+', nombre_norm) if len(w) > 3]
+                if any(kw in msg_norm for kw in keywords):
+                    producto_detectado = prod["nombre"]
+                    break
+            if producto_detectado:
+                mensaje_sistema_res = agregar_producto(producto_detectado, cantidad)
+                contexto_extra = f"{mensaje_sistema_res}"
+            else:
+                contexto_extra = "No encontré ese producto en el catálogo. Intenta con un nombre más específico."
+
+        # --- RESPUESTA FINAL SEGÚN MODO ---
         if modo_ia_real:
-            # --- MODO IA (GEMINI con Tools) ---
+            # --- MODO IA (con SDK moderno google-genai) ---
             historial = "No hay pedidos anteriores."
             if os.path.exists(PEDIDO_FILE):
                 try:
@@ -429,168 +469,43 @@ def chat():
                 "3. Sé amigable y natural, como un vecino del barrio."
             )
 
-            # Configurar Gemini con protección
+            prompt = f"{sys_instruction}\n\nMensaje del usuario: {mensaje_usuario}"
+            if contexto_extra:
+                prompt += f"\n\nContexto adicional del sistema (usa esta información para responder con precisión): {contexto_extra}"
+
             try:
-                import google.generativeai as genai
-                if not configure_genai():
+                from google import genai
+                
+                GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+                if not GOOGLE_API_KEY:
                     return jsonify({
-                        "respuesta": "El servicio de IA no está disponible. Verifica que GOOGLE_API_KEY esté configurada en Render.",
+                        "respuesta": "El servicio de IA no está disponible. Configura GOOGLE_API_KEY en el servidor.",
                         "carrito": carrito_actual
                     }), 500
-            except Exception as e:
-                return jsonify({
-                    "respuesta": f"Error al configurar la IA: {str(e)}",
-                    "carrito": carrito_actual
-                }), 500
 
-            # Mapa de funciones disponibles
-            funciones_disponibles = {
-                "consultar_inventario": consultar_inventario,
-                "agregar_producto": agregar_producto,
-                "calcular_total": calcular_total,
-                "confirmar_compra": confirmar_compra,
-            }
-
-            try:
-                model = genai.GenerativeModel(
-                    model_name='gemini-1.5-flash',
-                    system_instruction=sys_instruction,
-                    tools=tools_list,
-                    generation_config=genai.GenerationConfig(temperature=0.3)
-                )
-                response = model.generate_content(mensaje_usuario)
-            except Exception as e:
-                error_msg = str(e)
-                if "429" in error_msg:
-                    return jsonify({
-                        "respuesta": "Robot.ia alcanzó su límite de consultas. Intenta en unos minutos o cambia a Modo Demo.",
-                        "carrito": carrito_actual
-                    }), 429
-                return jsonify({
-                    "respuesta": f"Error en la API de Gemini: {error_msg}",
-                    "carrito": carrito_actual
-                }), 500
-
-            import google.generativeai.types as gtypes
-
-            # Bucle de function calling (máximo 5 turnos)
-            mensaje_respuesta = ""
-            historial_contenidos = [
-                {"role": "user", "parts": [mensaje_usuario]}
-            ]
-
-            for _turno in range(5):
-                # Verificar si hay function calls en la respuesta
-                candidate = response.candidates[0] if response.candidates else None
-                has_fc = (
-                    candidate is not None
-                    and any(
-                        part.function_call.name
-                        for part in candidate.content.parts
-                        if hasattr(part, 'function_call') and part.function_call.name
-                    )
+                gemini_client = genai.Client(
+                    api_key=GOOGLE_API_KEY
                 )
 
-                if not has_fc:
-                    mensaje_respuesta = response.text or ""
-                    break
+                response = gemini_client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=prompt
+                )
 
-                # Añadir la respuesta del modelo al historial
-                historial_contenidos.append({"role": "model", "parts": candidate.content.parts})
+                texto = getattr(response, "text", "")
 
-                # Ejecutar function calls y construir respuestas
-                function_responses = []
-                for part in candidate.content.parts:
-                    if hasattr(part, 'function_call') and part.function_call.name:
-                        fc = part.function_call
-                        fn = funciones_disponibles.get(fc.name)
-                        try:
-                            args = dict(fc.args) if fc.args else {}
-                            resultado = fn(**args) if fn else "Error: Función no encontrada"
-                            if fc.name != "consultar_inventario":
-                                mensaje_sistema_res = resultado
-                        except Exception as ex:
-                            resultado = f"Error: {str(ex)}"
-                        function_responses.append(
-                            gtypes.content_types.to_part(
-                                {"function_response": {"name": fc.name, "response": {"result": resultado}}}
-                            )
-                        )
+                if not texto:
+                    texto = "No pude generar una respuesta ahora mismo."
 
-                historial_contenidos.append({"role": "user", "parts": function_responses})
+                mensaje_respuesta = texto.strip()
 
-                try:
-                    response = model.generate_content(historial_contenidos)
-                except Exception as e:
-                    mensaje_respuesta = f"Error durante la conversación con la IA: {str(e)}"
-                    break
-            else:
-                mensaje_respuesta = response.text or "La consulta tomó demasiados pasos."
+            except Exception as e:
+                mensaje_respuesta = f"Error en la IA: {str(e)}"
 
         else:
-            # --- MODO DEMO (con DB en tiempo real) ---
-            msg_lower = mensaje_usuario.lower()
-
-            if any(kw in msg_lower for kw in ["pagar", "confirmar", "listo", "comprar"]):
-                nombre_demo = None
-                nombre_match = re.search(r'(?:soy|me llamo|mi nombre es)\s+([a-záéíóúñ]+)', msg_lower)
-                if nombre_match:
-                    nombre_demo = nombre_match.group(1).capitalize()
-                mensaje_sistema_res = confirmar_compra(nombre_cliente=nombre_demo)
-                mensaje_respuesta = f"{mensaje_sistema_res}"
-
-            elif any(kw in msg_lower for kw in ["precio", "cuesta", "vale", "cuánto", "cuanto"]):
-                busqueda = msg_lower
-                for pc in ["precio", "cuesta", "vale", "cuánto", "cuanto", "del", "de", "la", "el", "un", "una", "?", "¿"]:
-                    busqueda = busqueda.replace(pc, "")
-                busqueda = busqueda.strip().strip("?¿")
-                if busqueda:
-                    resultado = consultar_inventario(busqueda)
-                    datos = json.loads(resultado)
-                    if datos.get("encontrado"):
-                        prods = datos["productos"]
-                        info = [f"{p['nombre']}: ${p['precio']:,} ({p['stock']} uds)" for p in prods[:3]]
-                        mensaje_respuesta = " | ".join(info)
-                    else:
-                        mensaje_respuesta = f"No encontré '{busqueda}' en el catálogo."
-                else:
-                    mensaje_respuesta = "Dime qué producto te interesa y te doy el precio."
-
-            elif any(kw in msg_lower for kw in ["total", "boleta", "carrito"]):
-                mensaje_sistema_res = calcular_total()
-                mensaje_respuesta = f"{mensaje_sistema_res}"
-
-            elif any(kw in msg_lower for kw in ["qué tienen", "que tienen", "catálogo", "catalogo", "productos", "disponible"]):
-                resultado = consultar_inventario()
-                datos = json.loads(resultado)
-                cats = datos.get("categorias", {})
-                resumen = []
-                for cat, prods in cats.items():
-                    nombres_p = [f"{p['nombre']} (${p['precio']:,})" for p in prods[:3]]
-                    resumen.append(f"{cat}: {', '.join(nombres_p)}{'...' if len(prods) > 3 else ''}")
-                mensaje_respuesta = f"Tenemos {datos.get('total_productos', 0)} productos. " + " | ".join(resumen[:3])
-
-            elif any(kw in msg_lower for kw in ["agrega", "quiero", "llevar", "dame", "añade", "ponme"]):
-                num_match = re.search(r'\b(\d+)\b', msg_lower)
-                cantidad = int(num_match.group(1)) if num_match else 1
-                conn = conectar_db()
-                cursor = conn.cursor()
-                cursor.execute("SELECT nombre FROM productos ORDER BY LENGTH(nombre) DESC")
-                all_prods = [dict(r) for r in cursor.fetchall()]
-                conn.close()
-                msg_norm = msg_lower.replace("-", " ")
-                producto_detectado = None
-                for prod in all_prods:
-                    nombre_norm = prod["nombre"].lower().replace("-", " ")
-                    keywords = [w for w in re.split(r'[\s\-/()]+', nombre_norm) if len(w) > 3]
-                    if any(kw in msg_norm for kw in keywords):
-                        producto_detectado = prod["nombre"]
-                        break
-                if producto_detectado:
-                    mensaje_sistema_res = agregar_producto(producto_detectado, cantidad)
-                    mensaje_respuesta = f"{mensaje_sistema_res}"
-                else:
-                    mensaje_respuesta = "No encontré ese producto en el catálogo. Intenta con un nombre más específico."
+            # --- MODO DEMO (Texto crudo) ---
+            if contexto_extra:
+                mensaje_respuesta = contexto_extra
             else:
                 mensaje_respuesta = (
                     "¡Hola! Soy Robot.ia. Puedo mostrarte el catálogo, decirte precios, "
@@ -598,7 +513,7 @@ def chat():
                 )
 
         return jsonify({
-            "respuesta": mensaje_respuesta.strip(),
+            "respuesta": mensaje_respuesta,
             "sistema": mensaje_sistema_res,
             "carrito": carrito_actual
         })
