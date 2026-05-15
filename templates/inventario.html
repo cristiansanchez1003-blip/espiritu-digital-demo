@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Sabores del Sur — Dashboard de Inventario</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary": "#000000",
+            "primary-container": "#000000",
+            "surface": "#F8F9F5",
+            "on-surface": "#2D3142",
+            "on-primary": "#F8F9F5",
+            "outline": "#2D3142",
+            "surface-container-low": "#F1F2ED",
+            "surface-container": "#F1F2ED",
+            "secondary-container": "#000000",
+            "on-secondary-container": "#F8F9F5",
+            "error": "#ba1a1a",
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #F8F9F5; font-family: 'Poppins', sans-serif; }
+    h1, h2, h3, .nav-brand { font-family: 'Montserrat', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+    /* Table row animation */
+    .stock-row { transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+    .stock-row:hover { transform: translateX(4px); background-color: rgba(27, 67, 50, 0.03); }
+
+    /* Low stock pulse */
+    .low-stock-badge { animation: softPulse 2.5s ease-in-out infinite; }
+    @keyframes softPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* Stat card hover */
+    .stat-card { transition: all 0.3s ease; }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(27, 67, 50, 0.1); }
+
+    /* Skeleton loader */
+    .skeleton { background: linear-gradient(90deg, #f0eded 25%, #e4e2e1 50%, #f0eded 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* Status dot */
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .status-online { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+    .status-offline { background: #ef4444; }
+    body { background-color: #F8F9F5 !important; color: #2D3142 !important; }
+    
+    nav.app-nav {
+      position: fixed !important;
+      top: 1.5rem !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: 95% !important;
+      max-width: 1200px !important;
+      background-color: rgba(248, 249, 245, 0.95) !important;
+      backdrop-blur: 12px !important;
+      border-radius: 999px !important;
+      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08) !important;
+      height: 72px !important;
+      padding: 0 2rem !important;
+      z-index: 1000 !important;
+    }
+
+    header, nav, footer { background-color: #F8F9F5 !important; border-color: rgba(0, 0, 0, 0.1) !important; }
+    h1, h2, h3, h4, .text-primary { color: #000000 !important; }
+    .material-symbols-outlined { color: #000000 !important; }
+    header .material-symbols-outlined, nav .material-symbols-outlined { color: #000000 !important; }
+    header .material-symbols-outlined:hover, nav .material-symbols-outlined:hover { color: #333333 !important; }
+    button, .bg-primary, .bg-primary-container { 
+        background-color: #000000 !important; 
+        color: #F8F9F5 !important; 
+        border-radius: 12px !important; 
+        transition: all 0.3s ease; 
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    button:hover, .bg-primary:hover, .bg-primary-container:hover { 
+        background-color: #333333 !important; 
+        opacity: 1; 
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); 
+        transform: translateY(-1px);
+    }
+    .stat-card, [class*="rounded-lg"], [class*="rounded-2xl"], [class*="rounded-xl"] { border-radius: 16px !important; }
+    header img[alt="Sabores del Sur Logo"], nav img[alt="Sabores del Sur Logo"] {
+      object-fit: contain;
+      border-radius: 10px;
+      padding: 4px;
+      opacity: 0.94;
+    }
+    header a, nav a { color: #2D3142 !important; font-weight: 600; }
+    header a:hover, nav a:hover { color: #000000 !important; }
+    nav a[href*="inventario.html"], header a[href*="inventario.html"] {
+      background-color: #000000 !important;
+      color: #F8F9F5 !important;
+      padding: 0.6rem 1.2rem !important;
+      border-radius: 999px !important;
+      border: none !important;
+    }
+    footer { background-color: #F1F2ED !important; color: #2D3142 !important; }
+    footer a { color: #2D3142 !important; opacity: 0.8; }
+    footer a:hover { color: #000000 !important; opacity: 1; }
+    footer p { color: #2D3142 !important; opacity: 0.6; }
+
+    @media (max-width: 767px) {
+      .px-8, .px-6 { padding-left: 15px !important; padding-right: 15px !important; }
+      .stat-grid { grid-template-columns: 1fr 1fr !important; }
+    }
+  </style>
+</head>
+<body class="text-on-surface antialiased">
+
+  <!-- TopNavBar -->
+  <nav class="app-nav flex justify-between items-center px-8 h-20 max-w-7xl mx-auto backdrop-blur-md font-['Poppins'] antialiased">
+    <div class="flex items-center gap-12">
+      <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='Sabores del sur logo.jpeg') }}" alt="Sabores del Sur Logo" class="h-12 w-auto hover:scale-105 transition-transform duration-300 cursor-pointer drop-shadow-md logo-float"></a>
+      <div class="hidden md:flex items-center gap-8">
+        <a class="text-slate-600 font-medium hover:text-black transition-colors duration-200" href="{{ url_for('index') }}">Inicio</a>
+        <a class="text-slate-600 font-medium hover:text-black transition-colors duration-200" href="{{ url_for('catalogo') }}">Productos</a>
+        <a class="text-slate-600 font-medium hover:text-black transition-colors duration-200" href="{{ url_for('recetas') }}">Recetas IA</a>
+        
+        <a class="text-slate-600 font-medium hover:text-black transition-colors duration-200" href="{{ url_for('cuenta') }}">Mi cuenta</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+<a href="{{ url_for('inventario_page') }}" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-black text-white rounded-full font-medium text-[13px] hover:bg-zinc-800 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-white">inventory_2</span>Inventario</a>
+      <a href="{{ url_for('carrito_page') }}" class="flex items-center gap-2 active:scale-95 transition-transform hover:bg-black/10 p-2 rounded-full">
+        <span class="material-symbols-outlined text-black">shopping_cart</span>
+      </a>
+      <button class="material-symbols-outlined text-black active:scale-95 transition-transform hover:bg-black/10 p-2 rounded-full">account_circle</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="pt-28 pb-20 px-8 max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <section class="mb-12">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-3 mb-3">
+            <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+            <h1 class="text-4xl md:text-5xl font-bold text-primary tracking-tight">Control de Stock en Tiempo Real</h1>
+          </div>
+          <p class="text-lg text-outline max-w-2xl font-light">Monitoreo del inventario disponible en el Pasillo Digital</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-emerald-100">
+            <span id="serverStatus" class="status-dot status-offline"></span>
+            <span id="serverStatusText" class="text-sm font-medium text-slate-500">Conectando...</span>
+          </div>
+          <button id="refreshBtn" class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-full font-medium text-sm hover:bg-emerald-800 active:scale-95 transition-all shadow-md">
+            <span class="material-symbols-outlined text-lg">refresh</span>
+            Actualizar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Cards -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 stat-grid">
+      <div class="stat-card bg-white rounded-2xl p-6 shadow-sm border border-emerald-50">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">package_2</span>
+          </div>
+        </div>
+        <p id="statTotal" class="text-3xl font-bold text-primary mb-1">—</p>
+        <p class="text-sm text-outline">Productos Totales</p>
+      </div>
+      <div class="stat-card bg-white rounded-2xl p-6 shadow-sm border border-emerald-50">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">shelves</span>
+          </div>
+        </div>
+        <p id="statStock" class="text-3xl font-bold text-primary mb-1">—</p>
+        <p class="text-sm text-outline">Unidades en Stock</p>
+      </div>
+      <div class="stat-card bg-white rounded-2xl p-6 shadow-sm border border-emerald-50">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+            <span class="material-symbols-outlined text-amber-600 text-xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+          </div>
+        </div>
+        <p id="statLow" class="text-3xl font-bold text-amber-600 mb-1">—</p>
+        <p class="text-sm text-outline">Stock Bajo (&lt;10)</p>
+      </div>
+      <div class="stat-card bg-white rounded-2xl p-6 shadow-sm border border-emerald-50">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">payments</span>
+          </div>
+        </div>
+        <p id="statValue" class="text-3xl font-bold text-primary mb-1">—</p>
+        <p class="text-sm text-outline">Valor del Inventario</p>
+      </div>
+    </section>
+
+    <!-- Inventory Table -->
+    <section class="bg-white rounded-2xl shadow-sm border border-emerald-50 overflow-hidden">
+      <!-- Table Header -->
+      <div class="px-8 py-5 border-b border-emerald-50 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">database</span>
+          <h2 class="text-xl font-semibold text-primary">Inventario Detallado</h2>
+        </div>
+        <p id="lastUpdate" class="text-xs text-outline">Última actualización: —</p>
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-surface text-left text-xs uppercase tracking-wider text-outline font-semibold">
+              <th class="px-8 py-4">ID</th>
+              <th class="px-6 py-4">Producto</th>
+              <th class="px-6 py-4 text-right">Precio</th>
+              <th class="px-6 py-4 text-right">Stock</th>
+              <th class="px-6 py-4 text-right">Vence el</th>
+              <th class="px-8 py-4 text-right">Estado</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTable">
+            <!-- Skeleton rows while loading -->
+            <tr><td colspan="6" class="px-8 py-6"><div class="skeleton h-6 rounded-lg w-full"></div></td></tr>
+            <tr><td colspan="6" class="px-8 py-4"><div class="skeleton h-6 rounded-lg w-3/4"></div></td></tr>
+            <tr><td colspan="6" class="px-8 py-4"><div class="skeleton h-6 rounded-lg w-5/6"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6 bg-slate-50 border-t border-emerald-100 font-['Poppins'] text-sm tracking-wide text-emerald-900">
+    <div class="flex flex-col gap-4">
+      <img src="{{ url_for('static', filename='Sabores del sur logo.jpeg') }}" alt="Sabores del Sur Logo" class="h-10 w-auto hover:scale-105 transition-transform duration-300 cursor-pointer drop-shadow-md">
+      <p class="text-slate-500">© 2024 Sabores del Sur Supermarket. Digital Atelier for the Modern Grocer.</p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-8">
+      <a class="text-slate-500 hover:text-emerald-800 transition-opacity hover:opacity-80" href="#">Terms of Service</a>
+      <a class="text-slate-500 hover:text-emerald-800 transition-opacity hover:opacity-80" href="#">Privacy Policy</a>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = '';
+
+    // --- Fetch and render inventory ---
+    async function loadInventory() {
+      const table = document.getElementById('inventoryTable');
+      const statusDot = document.getElementById('serverStatus');
+      const statusText = document.getElementById('serverStatusText');
+
+      try {
+        const res = await fetch(`${API_BASE}/inventario`);
+        if (!res.ok) throw new Error('Not OK');
+        const data = await res.json();
+
+        // Server online
+        statusDot.className = 'status-dot status-online';
+        statusText.textContent = 'En línea';
+        statusText.classList.replace('text-slate-500', 'text-emerald-600');
+
+        renderTable(data);
+        updateStats(data);
+        document.getElementById('lastUpdate').textContent = 'Última actualización: ' + new Date().toLocaleTimeString('es-CL');
+      } catch (err) {
+        statusDot.className = 'status-dot status-offline';
+        statusText.textContent = 'Desconectado';
+        statusText.classList.replace('text-emerald-600', 'text-slate-500');
+        table.innerHTML = `<tr><td colspan="5" class="px-8 py-12 text-center text-outline"><span class="material-symbols-outlined text-4xl mb-2 block text-slate-300">cloud_off</span>No se pudo conectar con el servidor Flask.<br><span class="text-xs">Verifica que esté corriendo en ${API_BASE}</span></td></tr>`;
+      }
+    }
+
+    function renderTable(items) {
+      const table = document.getElementById('inventoryTable');
+      if (!items || items.length === 0) {
+        table.innerHTML = '<tr><td colspan="6" class="px-8 py-12 text-center text-outline">Sin productos en inventario.</td></tr>';
+        return;
+      }
+      
+      const hoy = new Date();
+      
+      table.innerHTML = items.map((item, i) => {
+        const isLow = item.stock < 10;
+        const isOut = item.stock === 0;
+        
+        // Logica de vencimiento
+        let isExpiringSoon = false;
+        let vencimientoColor = 'text-outline';
+        if (item.vencimiento) {
+            const fechaVencimiento = new Date(item.vencimiento);
+            const diffTime = fechaVencimiento - hoy;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays <= 3) {
+                isExpiringSoon = true;
+                vencimientoColor = 'text-red-600 font-bold';
+            }
+        }
+        
+        const rowBg = isOut ? 'bg-red-50/50' : isExpiringSoon ? 'bg-red-50/40' : isLow ? 'bg-amber-50/40' : '';
+        const stockColor = isOut ? 'text-red-600 font-bold' : isLow ? 'text-amber-700 font-semibold' : 'text-primary font-semibold';
+        const badge = isOut
+          ? '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-red-100 text-red-700">Agotado</span>'
+          : isLow
+          ? '<span class="low-stock-badge inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-700"><span class="material-symbols-outlined text-xs">priority_high</span>Bajo</span>'
+          : '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700">Disponible</span>';
+
+        return `
+          <tr class="stock-row border-b border-emerald-50/50 ${rowBg}" style="animation: fadeIn 0.3s ${i * 0.05}s both;">
+            <td class="px-8 py-5"><span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-surface text-xs font-bold text-primary">${item.id}</span></td>
+            <td class="px-6 py-5 font-medium text-on-surface">${item.nombre}</td>
+            <td class="px-6 py-5 text-right font-semibold text-primary">$${item.precio.toLocaleString('es-CL')}</td>
+            <td class="px-6 py-5 text-right"><span class="${stockColor}">${item.stock}</span></td>
+            <td class="px-6 py-5 text-right font-medium"><span class="${vencimientoColor}">${item.vencimiento || 'N/A'}</span></td>
+            <td class="px-8 py-5 text-right">${badge}</td>
+          </tr>`;
+      }).join('');
+    }
+
+    function updateStats(items) {
+      document.getElementById('statTotal').textContent = items.length;
+      const totalStock = items.reduce((a, b) => a + b.stock, 0);
+      document.getElementById('statStock').textContent = totalStock;
+      const lowCount = items.filter(i => i.stock < 10).length;
+      document.getElementById('statLow').textContent = lowCount;
+      const totalValue = items.reduce((a, b) => a + (b.precio * b.stock), 0);
+      document.getElementById('statValue').textContent = '$' + totalValue.toLocaleString('es-CL');
+    }
+
+    // Load on page ready
+    document.addEventListener('DOMContentLoaded', () => {
+      loadInventory();
+      document.getElementById('refreshBtn').addEventListener('click', loadInventory);
+      // Auto-refresh every 15 seconds
+      setInterval(loadInventory, 15000);
+    });
+  </script>
+  <style>
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</body>
+</html>

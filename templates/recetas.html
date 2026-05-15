@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+            "primary": "#2D6A4F",
+            "background": "#F8F9F5",
+            "surface": "#F8F9F5",
+            "on-surface": "#2D3142",
+            "on-background": "#2D3142",
+            "primary-container": "#2D6A4F",
+            "on-primary-container": "#F8F9F5",
+            "secondary": "#D9ED92",
+            "on-secondary": "#1B4332",
+            "outline": "#2D3142",
+            "surface-container": "#F1F2ED",
+            "tertiary": "#2D3142"
+          },          "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "margin-desktop": "40px",
+                        "container-max": "1280px",
+                        "section-gap": "80px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Montserrat", "Inter", "sans-serif"],
+                        "label-sm": ["Poppins", "Inter", "sans-serif"],
+                        "display-lg": ["Montserrat", "Inter", "sans-serif"],
+                        "body-md": ["Poppins", "Inter", "sans-serif"],
+                        "body-lg": ["Poppins", "Inter", "sans-serif"],
+                        "label-md": ["Montserrat", "Inter", "sans-serif"],
+                        "headline-lg": ["Montserrat", "Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "1.0", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .ambient-shadow {
+            box-shadow: 0px 12px 32px rgba(1, 68, 33, 0.04);
+        }
+        .recipe-card:hover {
+            box-shadow: 0px 12px 32px rgba(1, 68, 33, 0.08);
+            transform: translateY(-8px);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        /* === Sabores del Sur ANIMATION SYSTEM === */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes floatLogo { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
+        .animate-on-scroll { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+        .animate-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+        .stagger-children > *:nth-child(1) { transition-delay: 0ms; }
+        .stagger-children > *:nth-child(2) { transition-delay: 150ms; }
+        .stagger-children > *:nth-child(3) { transition-delay: 300ms; }
+        .stagger-children > *:nth-child(4) { transition-delay: 450ms; }
+        .stagger-children > *:nth-child(5) { transition-delay: 600ms; }
+        .stagger-children > *:nth-child(6) { transition-delay: 750ms; }
+        .logo-float { animation: floatLogo 4s ease-in-out infinite; }
+        .hero-entrance { animation: fadeInUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+        .btn-solid-premium {
+        background-color: #2D6A4F !important;
+        color: white !important;
+        border-radius: 12px !important;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(45, 106, 79, 0.15);
+    }
+
+    .btn-solid-premium:hover {
+        background-color: #1B4332 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(45, 106, 79, 0.25);
+    }
+
+    .card-premium {
+        background: white;
+        border-radius: 12px !important;
+        border: 1px solid rgba(45, 106, 79, 0.05);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    body { background-color: #F8F9F5 !important; color: #2D3142 !important; font-family: 'Poppins', sans-serif; }
+    
+    nav.app-nav {
+      position: fixed !important;
+      top: 1.5rem !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: 95% !important;
+      max-width: 1200px !important;
+      background-color: rgba(248, 249, 245, 0.95) !important;
+      backdrop-blur: 12px !important;
+      border-radius: 16px !important;
+      border: 1px solid rgba(45, 106, 79, 0.1) !important;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08) !important;
+      height: 72px !important;
+      padding: 0 2rem !important;
+      z-index: 1000 !important;
+    }
+
+    header, nav, footer { background-color: #F8F9F5 !important; border-color: rgba(0, 0, 0, 0.1) !important; }
+    h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #2D6A4F !important; }
+    
+    .material-symbols-outlined { color: #2D6A4F !important; }
+    header .material-symbols-outlined, nav .material-symbols-outlined { color: #2D6A4F !important; }
+    header .material-symbols-outlined:hover, nav .material-symbols-outlined:hover { color: #1B4332 !important; }
+    
+    header img[alt="Sabores del Sur Logo"], nav img[alt="Sabores del Sur Logo"] {
+      object-fit: contain;
+      border-radius: 10px;
+      padding: 4px;
+      opacity: 0.94;
+    }
+    header a, nav a { color: #2D3142 !important; font-weight: 600; font-family: 'Poppins', sans-serif; }
+    header a:hover, nav a:hover { color: #2D6A4F !important; }
+    nav a[href*="inventario.html"], header a[href*="inventario.html"] {
+      background-color: #2D6A4F !important;
+      color: white !important;
+      padding: 0.6rem 1.2rem !important;
+      border-radius: 12px !important;
+      border: none !important;
+    }
+    footer { background-color: #F1F2ED !important; color: #2D3142 !important; }
+    footer a { color: #2D3142 !important; opacity: 0.8; }
+    footer a:hover { color: #2D6A4F !important; opacity: 1; }
+    footer p { color: #2D3142 !important; opacity: 0.6; }
+
+        /* === MOBILE OPTIMIZATION === */
+        @media (max-width: 767px) {
+            .px-8, .px-6, .px-4 { padding-left: 15px !important; padding-right: 15px !important; width: 100% !important; box-sizing: border-box !important; }
+            .font-display-lg { font-size: calc(48px * 0.85) !important; }
+            .font-headline-lg { font-size: calc(32px * 0.85) !important; }
+            .font-headline-md { font-size: calc(24px * 0.85) !important; }
+            .grid { grid-template-columns: 1fr !important; }
+            .md\:flex-row { flex-direction: column !important; }
+            header, nav { position: sticky !important; top: 0 !important; z-index: 50 !important; }
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md">
+<!-- TopNavBar -->
+<header>
+    <nav class="app-nav flex justify-between items-center px-8 h-20 max-w-7xl mx-auto backdrop-blur-md font-['Inter'] antialiased">
+    <div class="flex items-center gap-12">
+      <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='Sabores del sur logo.jpeg') }}" alt="Sabores del Sur Logo" class="h-12 w-auto hover:scale-105 transition-transform duration-300 cursor-pointer drop-shadow-md logo-float"></a>
+      <div class="hidden md:flex items-center gap-8">
+        <a class="text-slate-600 dark:text-slate-400 font-medium hover:text-black transition-colors duration-200" href="{{ url_for('index') }}">Inicio</a>
+        <a class="text-slate-600 dark:text-slate-400 font-medium hover:text-black transition-colors duration-200" href="{{ url_for('catalogo') }}">Productos</a>
+        <a class="text-black font-semibold border-b-2 border-black pb-1" href="{{ url_for('recetas') }}">Recetas IA</a>
+        <a class="text-slate-600 dark:text-slate-400 font-medium hover:text-black transition-colors duration-200" href="{{ url_for('cuenta') }}">Mi cuenta</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <a href="{{ url_for('inventario_page') }}" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-black text-white rounded-full font-medium text-[13px] hover:bg-zinc-800 transition-colors shadow-sm">
+      <span class="material-symbols-outlined text-[16px] text-white">inventory_2</span>Inventario</a>
+      <a href="{{ url_for('carrito_page') }}" class="material-symbols-outlined text-black hover:opacity-80 transition-opacity">shopping_cart</a>
+      <button class="material-symbols-outlined text-black hover:opacity-80 transition-opacity">person</button>
+    </div>
+  </nav>
+</header>
+<main class="pt-32 pb-20">
+<!-- Header Section -->
+<section class="max-w-7xl mx-auto px-8 mb-16">
+<div class="max-w-2xl">
+<h1 class="font-display-lg text-display-lg text-primary mb-4">Recetas sugeridas para ti</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                    Basado en tu búsqueda asistida por IA para "What do you want to cook today?"
+                </p>
+</div>
+</section>
+<!-- Recipe Grid -->
+<section class="max-w-7xl mx-auto px-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+<!-- Recipe Card 1 -->
+<article class="recipe-card bg-surface-container-lowest rounded-lg overflow-hidden flex flex-col h-full ambient-shadow">
+<div class="relative aspect-[4/3] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A high-end culinary photograph of a vibrant Mediterranean salmon salad bowl on a clean marble countertop. The lighting is soft and natural, emphasizing the fresh textures of perfectly seared salmon, bright greens, and ripe tomatoes. The overall aesthetic is premium and minimalist, following a sophisticated palette of deep greens and earthy tones to match the luxury grocer brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiyWyux0WrBHSGW5VhLG1cLuTueCSiFcZbKsIhlKEGnAwsKLZbLi8jYNIPE2HLBHTGUWqI3olg_UBEYQEwpKFwXMvOw8TNND1kjWgJX_m7Ul4qtaTa3PLPY__KCB6EErBg-sUsnwGmJ8CazPoz-TDAlm2BtIpGtM74yXeiWoQzsgr81TwUuflHRov1Q1Jnw-gGUiIWr3X7l7ftWsZprkt7aP4kolA7II5SwzyDtVz4GWSMd0f_lbvviBf61gQEgXS52khS4DW0zgw"/>
+<div class="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-sm font-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                            Recomendación de la IA
+                        </div>
+</div>
+<div class="p-8 flex flex-col flex-grow">
+<h3 class="font-headline-lg text-headline-lg text-primary mb-3">Salmón Silvestre con Costra de Hierbas</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow">Una interpretación moderna del clásico mediterráneo, utilizando salmón de pesca sostenible y hierbas de huerto orgánico.</p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-surface-variant">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+<span class="font-label-md text-label-md">25 MIN</span>
+</div>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors">
+                                Ver Receta
+                            </button>
+</div>
+</div>
+</article>
+<!-- Recipe Card 2 -->
+<article class="recipe-card bg-surface-container-lowest rounded-lg overflow-hidden flex flex-col h-full ambient-shadow">
+<div class="relative aspect-[4/3] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A gourmet close-up shot of a rustic handmade pasta dish served in a heavy ceramic bowl. The lighting is moody yet bright enough to show the intricate details of fresh basil leaves and aged parmesan shavings. The scene reflects a high-end Digital Atelier style with clean lines, ample negative space, and a focus on ingredient provenance and artisan quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtaH_JLtVahcGdr98w0SdMNAZdfpUhoKEW6AbIJtXbVnnRnuuOqa_7_r0W75eHbert3lBzAzRmwT8VLM-crLVqYNoooCA3wEXgDC2jv2o5YWyJGlZSUSN4hcojNptrRuPHDr_ejbqtAFTnr-sQET7v-pkJ7k4aHzwlUEE6w9gbiBDkAGBEGQ6kllkufIrLBs8FCOxOTITQChWgEg0oFvyCSsarTIoepB7CUHMxdJQNleu3-mGpd1UKSWUebjfWI0FHFQG57pboUoY"/>
+<div class="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-sm font-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                            Nivel: Intermedio
+                        </div>
+</div>
+<div class="p-8 flex flex-col flex-grow">
+<h3 class="font-headline-lg text-headline-lg text-primary mb-3">Pappardelle Artesanal al Pesto Galego</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow">Pasta fresca elaborada con sémola de alta calidad y un pesto único con toques de nueces de proximidad.</p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-surface-variant">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+<span class="font-label-md text-label-md">35 MIN</span>
+</div>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors">
+                                Ver Receta
+                            </button>
+</div>
+</div>
+</article>
+<!-- Recipe Card 3 -->
+<article class="recipe-card bg-surface-container-lowest rounded-lg overflow-hidden flex flex-col h-full ambient-shadow">
+<div class="relative aspect-[4/3] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="An artfully arranged bowl of roasted seasonal vegetables and ancient grains, shot from a professional top-down perspective. The color palette is rich with deep purples, oranges, and greens, set against a neutral, textured background. The image evokes a sense of smart, frictionless health and wellness, perfect for an affluent urban professional demographic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUCEnzkB9qxOPxPTw3r7KDJ6-QokrupMWnXTti1QRZucyZl3MHE5gyAqJhILoJ2v0lxljDe1Lw3nhDSz5L5gobGOnkx7pAz6dDwm-ga1my2LRIX5URke0Zv8gxAGi-mMszfYyLy6hXpPKN52Zu-8MUYswwry1kn9pkvNgqkDO0UnlqkGRVI6_VcHudDydvCOQLo4ZdxAYpzlcQkDBZ0vQSavB0DaA2yAEkM2vVPXvHhyrA27A4xt1KeIKkHiSWc024c5dqzMpCFe4"/>
+<div class="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-sm font-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">nutrition</span>
+                            Altamente Nutritivo
+                        </div>
+</div>
+<div class="p-8 flex flex-col flex-grow">
+<h3 class="font-headline-lg text-headline-lg text-primary mb-3">Bowl de Raíces y Granos Ancestrales</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow">Una combinación equilibrada de quinoa real, vegetales asados al fuego y una vinagreta de cítricos orgánicos.</p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-surface-variant">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+<span class="font-label-md text-label-md">20 MIN</span>
+</div>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors">
+                                Ver Receta
+                            </button>
+</div>
+</div>
+</article>
+<!-- Recipe Card 4 -->
+<article class="recipe-card bg-surface-container-lowest rounded-lg overflow-hidden flex flex-col h-full ambient-shadow">
+<div class="relative aspect-[4/3] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional food photograph of a gourmet roasted chicken breast with glazed root vegetables. The plate is minimalist and dark, allowing the golden-brown crispy skin of the chicken to stand out. Soft ambient lighting creates subtle depth and a warm, inviting mood that fits the premium Digital Atelier visual identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2RV2NZQFtA7OfUG7ZCfMNHK_U2dFZMNA9bq-0EDiOewAEoEV45roITAAQlRV2jbM4D09_y-B1CW6SmBh3aVyNPO9Ued2xbrypQmXBJQmuWpJUoag5F0mmo8AJQLoaziqBToYPUG5db8Cx19k8khr9xwUIycpzLlJZsyCEkOuHIP_knbxUgpGC-apcFw00VWzHqfAJScFdiFA07mjLil1TjwJCADwHREL4hBvxruCCrbqd-qCGwinOLuGt8W_VLiYuAthzXmfmpG4"/>
+<div class="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-sm font-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+                            Favorito de la Temporada
+                        </div>
+</div>
+<div class="p-8 flex flex-col flex-grow">
+<h3 class="font-headline-lg text-headline-lg text-primary mb-3">Pollo de Granja al Limón y Tomillo</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow">Pollo criado en libertad, marinado por 24 horas y asado lentamente para preservar su jugosidad natural.</p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-surface-variant">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+<span class="font-label-md text-label-md">45 MIN</span>
+</div>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors">
+                                Ver Receta
+                            </button>
+</div>
+</div>
+</article>
+<!-- Recipe Card 5 -->
+<article class="recipe-card bg-surface-container-lowest rounded-lg overflow-hidden flex flex-col h-full ambient-shadow">
+<div class="relative aspect-[4/3] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A clean and bright food composition featuring a variety of colorful hummus dips and artisan crackers on a slate board. The lighting is high-key and fresh, suggesting a healthy and smart snack option. The aesthetic is sophisticated, leveraging neutral backgrounds to make the vibrant ingredients pop as primary visual drivers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-6iWOTaG_1lhU3Ogs1r7ZOBXJk_kEVqdgP6gGhJ2R-bMWxLc_p3mfd7XQQVuK68nJEfqvgjSH4w-IyoTvUihdU9zaxOFQrP6njDGY5J9azEOyB3wH1w6DdtoFuELMn-gRC81J3fFjNv_qigqtuypGf-TCOri9NZQ21ZXcvAev3t8P7-U2xnecHGYMZlMIh6YwUqjl-533wt-ARaPdfJiQN-Dihqs1Oaze65x9LKTKC99UrEinwhZv8ERNYozcPUy83QtkNs3VN-I"/>
+<div class="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-sm font-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">nature</span>
+                            100% Plant-Based
+                        </div>
+</div>
+<div class="p-8 flex flex-col flex-grow">
+<h3 class="font-headline-lg text-headline-lg text-primary mb-3">Degustación de Hummus de Temporada</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow">Tres variedades: remolacha, cúrcuma y cilantro, servidas con pan de masa madre recién horneado.</p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-surface-variant">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+<span class="font-label-md text-label-md">15 MIN</span>
+</div>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors">
+                                Ver Receta
+                            </button>
+</div>
+</div>
+</article>
+<!-- Recipe Card 6 -->
+<article class="recipe-card bg-surface-container-lowest rounded-lg overflow-hidden flex flex-col h-full ambient-shadow">
+<div class="relative aspect-[4/3] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional close-up of premium grilled steaks resting on a wooden board with sprigs of fresh rosemary and sea salt crystals. The lighting is dramatic, highlighting the quality and texture of the meat. The image targets high-end consumers looking for frictionless logistics and luxury ingredients, maintaining a grounded and transparent visual style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4BiOagK6E_r3kDND_wbAw7O-0fJFr_U1kgmALBDFrfM6PMJ3MV8V7kg7oGxohj6CQygME-PCUTv_XzK8k30jKEZ_JMxYGS90vJ8mrq9HGHEp6hBxcLU6HVzq2OLAgh2iIw8_u_iuCb6LO2bKhXZQkeug3KEe4bzvgcIpY17spjFfn4GD3CJD7eisyWWVZlv-nlEFCCfBvxc6wCwYp6NI_PPhs3vD1ze3fhgQOvCGLCppwyMZGPhcapm6k5wiQrEk0pWdxkzin9kg"/>
+<div class="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-sm font-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                            Corte Premium
+                        </div>
+</div>
+<div class="p-8 flex flex-col flex-grow">
+<h3 class="font-headline-lg text-headline-lg text-primary mb-3">Entrecot Dry-Aged con Mantequilla Ahumada</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow">Carne seleccionada con 45 días de maduración, resaltada con sal de escamas y aromáticas frescas.</p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-surface-variant">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+<span class="font-label-md text-label-md">40 MIN</span>
+</div>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors">
+                                Ver Receta
+                            </button>
+</div>
+</div>
+</article>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-20 bg-emerald-950 dark:bg-black border-t border-emerald-800/30">
+<div class="flex flex-col md:flex-row justify-between items-center py-12 px-8 max-w-7xl mx-auto gap-6 font-['Inter'] text-sm tracking-wide uppercase">
+<a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='Sabores del sur logo.jpeg') }}" alt="Sabores del Sur Logo" class="h-10 w-auto drop-shadow-md"></a>
+<nav class="flex gap-8">
+<a class="text-emerald-100/60 hover:text-white transition-colors" href="#">Sourcing</a>
+<a class="text-emerald-100/60 hover:text-white transition-colors" href="#">Sustainability</a>
+<a class="text-emerald-100/60 hover:text-white transition-colors" href="#">Privacy</a>
+<a class="text-emerald-100/60 hover:text-white transition-colors" href="#">Terms</a>
+</nav>
+<p class="text-emerald-100/60 lowercase normal-case">© 2024 Sabores del Sur Digital Atelier. All rights reserved.</p>
+</div>
+</footer>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('is-visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+    document.querySelectorAll('article, section h1, section p').forEach(el => {
+      if (!el.classList.contains('animate-on-scroll')) { el.classList.add('animate-on-scroll'); observer.observe(el); }
+    });
+    document.querySelectorAll('.grid').forEach(g => g.classList.add('stagger-children'));
+    document.querySelectorAll('img[alt="Sabores del Sur Logo"]').forEach(l => l.classList.add('logo-float'));
+    const h1 = document.querySelector('h1'); if (h1) h1.classList.add('hero-entrance');
+  });
+</script>
+</body></html>

@@ -1,0 +1,16 @@
+{
+    "fecha_pedido": "2026-05-14 20:25:27",
+    "productos": [
+        {
+            "id": 42,
+            "nombre": "Vino Gato Negro Cabernet 1.5L",
+            "precio": 4200,
+            "cantidad": 1,
+            "subtotal": 4200
+        }
+    ],
+    "total": 4200,
+    "descuento": 0,
+    "promos_aplicadas": [],
+    "estado": "Confirmado"
+}
