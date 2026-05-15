@@ -48,7 +48,7 @@ def obtener_columnas_producto():
 
 def construir_campos_producto():
     columnas = obtener_columnas_producto()
-    campos = [c for c in ["id", "nombre", "precio", "stock", "categoria"] if c in columnas]
+    campos = [c for c in ["id", "nombre", "precio", "stock", "categoria", "fecha_vencimiento"] if c in columnas]
     campos.append("imagen_url" if "imagen_url" in columnas else "'' AS imagen_url")
     return ", ".join(campos)
 
@@ -90,7 +90,7 @@ def consultar_inventario(producto: str = None):
         cursor = conn.cursor()
         if producto and producto.strip():
             cursor.execute(
-                "SELECT id, nombre, precio, stock, categoria FROM productos "
+                "SELECT id, nombre, precio, stock, categoria, fecha_vencimiento FROM productos "
                 "WHERE nombre LIKE ? ORDER BY nombre ASC",
                 (f"%{producto.strip()}%",)
             )
@@ -102,13 +102,13 @@ def consultar_inventario(producto: str = None):
                 )
             resultados = [
                 {"id": r["id"], "nombre": r["nombre"], "precio": r["precio"],
-                 "stock": r["stock"], "categoria": r["categoria"]}
+                 "stock": r["stock"], "categoria": r["categoria"], "fecha_vencimiento": r["fecha_vencimiento"]}
                 for r in rows
             ]
             return json.dumps({"encontrado": True, "productos": resultados}, ensure_ascii=False)
         else:
             cursor.execute(
-                "SELECT id, nombre, precio, stock, categoria FROM productos "
+                "SELECT id, nombre, precio, stock, categoria, fecha_vencimiento FROM productos "
                 "ORDER BY categoria ASC, nombre ASC"
             )
             rows = [dict(r) for r in cursor.fetchall()]
@@ -116,7 +116,7 @@ def consultar_inventario(producto: str = None):
             for r in rows:
                 cat = r.get("categoria") or "Otros"
                 categorias.setdefault(cat, []).append(
-                    {"id": r["id"], "nombre": r["nombre"], "precio": r["precio"], "stock": r["stock"]}
+                    {"id": r["id"], "nombre": r["nombre"], "precio": r["precio"], "stock": r["stock"], "fecha_vencimiento": r["fecha_vencimiento"]}
                 )
             return json.dumps({"total_productos": len(rows), "categorias": categorias}, ensure_ascii=False)
     except Exception as e:
