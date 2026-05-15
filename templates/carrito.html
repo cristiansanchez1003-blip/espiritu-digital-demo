@@ -301,7 +301,7 @@
 
     async function loadCart() {
         try {
-            const res = await fetch('/carrito');
+            const res = await fetch('/api/carrito');
             if (!res.ok) throw new Error('Network error');
             const data = await res.json();
             renderCart(data);
@@ -396,7 +396,7 @@
                 btnConfirmar.parentNode.appendChild(msgDiv);
                 
                 setTimeout(() => {
-                    window.location.href = 'cuenta.html';
+                    window.location.href = '/cuenta';
                 }, 2500);
             } else if (allText.includes('vacío') || allText.includes('vacio')) {
                 alert('El carrito está vacío. Agrega productos antes de confirmar.');

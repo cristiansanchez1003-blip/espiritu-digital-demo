@@ -232,42 +232,16 @@
 
     /* === MOBILE OPTIMIZATION === */
     @media (max-width: 767px) {
-
-      .px-8,
-      .px-6,
-      .px-4 {
-        padding-left: 15px !important;
-        padding-right: 15px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-      }
-
-      .font-display-lg {
-        font-size: calc(48px * 0.85) !important;
-      }
-
-      .font-headline-lg {
-        font-size: calc(32px * 0.85) !important;
-      }
-
-      .font-headline-md {
-        font-size: calc(24px * 0.85) !important;
-      }
-
-      .grid {
-        grid-template-columns: 1fr !important;
-      }
-
-      .md\:flex-row {
-        flex-direction: column !important;
-      }
-
-      header,
-      nav {
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 50 !important;
-      }
+      .px-8, .px-6, .px-4 { padding-left: 15px !important; padding-right: 15px !important; width: 100% !important; box-sizing: border-box !important; }
+      .font-display-lg { font-size: calc(48px * 0.7) !important; }
+      .font-headline-lg { font-size: calc(32px * 0.7) !important; }
+      .font-headline-md { font-size: calc(24px * 0.7) !important; }
+      .grid { grid-template-columns: 1fr !important; }
+      .md\:flex-row { flex-direction: column !important; }
+      header, nav { position: sticky !important; top: 0 !important; z-index: 50 !important; }
+      nav.app-nav { position: fixed !important; width: 100% !important; max-width: 100% !important; border-radius: 0 !important; top: 0 !important; height: 70px !important; padding: 0 1rem !important; }
+      .gap-8 { gap: 1.5rem !important; }
+      .py-12 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
     }
 
     body {
@@ -290,7 +264,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: url('{{ url_for('static', filename='local .jpeg') }}') center center / cover no-repeat;
+      background: url("{{ url_for('static', filename='local .jpeg') }}") center center / cover no-repeat;
       opacity: 0.1;
       filter: grayscale(100%);
     }

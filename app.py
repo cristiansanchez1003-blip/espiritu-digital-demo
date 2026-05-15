@@ -48,7 +48,7 @@ def obtener_columnas_producto():
 
 def construir_campos_producto():
     columnas = obtener_columnas_producto()
-    campos = [c for c in ["id", "nombre", "precio", "stock", "categoria"] if c in columnas]
+    campos = [c for c in ["id", "nombre", "precio", "stock", "categoria", "fecha_vencimiento"] if c in columnas]
     campos.append("imagen_url" if "imagen_url" in columnas else "'' AS imagen_url")
     return ", ".join(campos)
 
@@ -488,7 +488,7 @@ def chat():
                 )
 
                 response = gemini_client.models.generate_content(
-                    model="gemini-2.0-flash",
+                    model="gemini-3.1-flash",
                     contents=prompt
                 )
 
